@@ -12,6 +12,7 @@
 		display: -webkit-flex; 
 		display: flex;
 		flex-grow: 1;		
+		/*background: url(parquet.svg);*/
 	}
 	#controls{
 		width:250px;
@@ -48,7 +49,7 @@
 		<p>Width</p>
 		<p><input id="parquetWidthtrange" type="range" min="10" max="2000" step="1" value="400" name="width"><input class="number" id="parquetWidthnumber" min="10" value="400"  type="number" name="width"></p>
 		ELEMENTS
-		<p>Borders<input type="checkbox"><input type="color" name="background" disabled><input class="number" type="number" name="border" disabled></p>
+		<p>Borders<input type="checkbox" id="elementBordercheckbox"><input id="elementBordercolor" type="color" name="background" disabled><input id="elementBordernumber" class="number" type="number" name="border" min=0 step=1 value=1 disabled></p>
 		<p>Background <input type="checkbox" checked id="elementBackgroundcheckbox"><input type="color" id="elementBackgroundcolor" name="background" value="#FFFFFF"></p>
 		<p>Radius</p>
 		<p><input type="range" min="1" max="100" step="1" value="15" id="parquetRadiusrange" name="rows"><input min="1" value="15" class="number" id="parquetRadiusnumber" type="number" name="rows"></p>
@@ -71,9 +72,24 @@
 	
 	const elementBackgroundcolor=document.getElementById("elementBackgroundcolor");
 	const elementBackgroundcheckbox=document.getElementById("elementBackgroundcheckbox");
-	
 	elementBackgroundcheckbox.addEventListener("input",(e)=>{elementBackgroundcheckbox.checked?elementBackgroundcolor.disabled=false:elementBackgroundcolor.disabled=true;reBuild();});
 	elementBackgroundcolor.addEventListener("input",(e)=>{reBuild();});
+	
+	const elementBordercolor=document.getElementById("elementBordercolor");
+	const elementBordercheckbox=document.getElementById("elementBordercheckbox");
+	const elementBordernumber=document.getElementById("elementBordernumber");
+	elementBordercheckbox.addEventListener("input",(e)=>{
+		if (elementBordercheckbox.checked){
+			elementBordercolor.disabled=false;
+			elementBordernumber.disabled=false;
+		}else{
+			elementBordercolor.disabled=true;
+			elementBordernumber.disabled=true;
+		}
+		reBuild();
+	});
+	elementBordercolor.addEventListener("input",(e)=>{reBuild();});
+	elementBordernumber.addEventListener("input",(e)=>{reBuild();});
 	
 	const svgContainer=document.getElementById("SVG");
 	const parquetHeightrange=document.getElementById("parquetHeightrange");
@@ -132,7 +148,7 @@
 	}
 	//Возвращает SVG гексигональный паркет шириной n и высотой m шестиугольников радиуса r c расстоянием между ними l 
 	//размещенный в холсте шириной width и высотой height пикселей
-	const createParquet=(width,height,n,m,r,l,bgColor,elColor)=>{
+	const createParquet=(width,height,n,m,r,l,bgColor,elColor,border,borderWidth)=>{
 		const hexagonWidth=Math.sqrt(3)/2*(2*r);
 		const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		const background=document.createElementNS("http://www.w3.org/2000/svg", "rect"); 
@@ -161,7 +177,8 @@
 		SVG.appendChild(background);
 		hexagon.setAttribute("id","hexagon");
 		hexagon.setAttribute("fill",elColor);
-		hexagon.setAttribute("stroke","none");
+		hexagon.setAttribute("stroke",border);
+		hexagon.setAttribute("stroke-width",borderWidth);
 		hexagon.setAttribute("d",hexagonForming(0,0,r));
 		defs.appendChild(hexagon);
 		SVG.appendChild(horizontal);
@@ -189,14 +206,14 @@
 	}
 	const reBuild=()=>{
 		svgContainer.innerHTML="";
-		createParquet(parquetWidthnumber.value,parquetHeightnumber.value,parquetRowsnumber.value,parquetColumnsnumber.value,parquetRadiusnumber.value,parquetSpacenumber.value,parquetBackgroundcolor.disabled?"none":parquetBackgroundcolor.value,elementBackgroundcolor.disabled?"none":elementBackgroundcolor.value);
+		createParquet(parquetWidthnumber.value,parquetHeightnumber.value,parquetRowsnumber.value,parquetColumnsnumber.value,parquetRadiusnumber.value,parquetSpacenumber.value,parquetBackgroundcolor.disabled?"none":parquetBackgroundcolor.value,elementBackgroundcolor.disabled?"none":elementBackgroundcolor.value,elementBordercolor.disabled?"none":elementBordercolor.value,elementBordernumber.value);
 	}
   </script>
 
 <script type="text/javascript">
 //let hex=document.getElementById("template");
 	//hex.setAttribute("d",hexagonForming(0,0,30));
-	createParquet(400,400,16,18,15,1,"#0000FF","#FFFFFF");
+	createParquet(400,400,16,18,15,1,"#0000FF","#FFFFFF","none",1);
 </script>
 </body>
 
