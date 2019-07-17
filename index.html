@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>hexagon</title>
+  <!--[if IE]>
+   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style>
+	body{
+		display: -webkit-flex; 
+		display: flex;
+		flex-grow: 1;		
+	}
+	#controls{
+		width:250px;
+		border : 1px solid black;
+		flex-shrink: 0;
+		flex-grow: 0;
+	}
+	.number{
+		width:50px;	
+	}
+	p{
+		
+		vertical-align:middle;
+	}
+	input{
+		display:inline;
+	}
+  </style>
+</head>
+
+<body>
+	<div id="controls">
+		PARQUET
+		<p>Parquet type</p>
+		<p><input type="radio" name="type" checked>Hexagobal</p>
+		<p><input type="radio" name="type" disabled>Mixed</p>
+		<p>Background <input type="checkbox"><input type="color" name="background" disabled></p>
+		<p>Height</p>
+		<p><input id="parquetHeightrange" type="range" min="10" max="2000" step="1" value="400" name="height"><input class="number" id="parquetHeightnumber" min="10" value="400" type="number" name="height"></p>
+		<p>Width</p>
+		<p><input id="parquetWidthtrange" type="range" min="10" max="2000" step="1" value="400" name="width"><input class="number" id="parquetWidthnumber" min="10" value="400"  type="number" name="width"></p>
+		ELEMENTS
+		<p>Borders<input type="checkbox"><input type="color" name="background" disabled><input class="number" type="number" name="border" disabled></p>
+		<p>Background <input type="checkbox"><input type="color" name="background" disabled></p>
+		<p>Radius</p>
+		<p><input type="range" min="1" max="100" step="1" value="15" id="parquetRadiusrange" name="rows"><input min="1" value="15" class="number" id="parquetRadiusnumber" type="number" name="rows"></p>
+		<p>Rows</p>
+		<p><input type="range" min="1" max="100" step="1" value="15" id="parquetRowsrange" name="rows"><input min="1" value="15" class="number" id="parquetRowsnumber" type="number" name="rows"></p>
+		<p>Columns</p>
+		<p><input type="range" min="1" max="100" step="1" id="parquetColumnsrange" value="15"><input class="number" value="15" type="number" name="columns" id="parquetColumnsnumber"></p>
+		<p>Space <input class="number" min="0" value=1 type="number" name="space" ></p>
+		
+           
+	</div>
+	<div id="SVG"></div>
+    <script type="text/javascript">
+	const svgContainer=document.getElementById("SVG");
+	const parquetHeightrange=document.getElementById("parquetHeightrange");
+	const parquetHeightnumber=document.getElementById("parquetHeightnumber");
+	parquetHeightrange.addEventListener("input",(e)=>{parquetHeightnumber.value=parquetHeightrange.value;reBuild()});
+	parquetHeightnumber.addEventListener("input",(e)=>{parquetHeightrange.value=parquetHeightnumber.value;reBuild()});
+	
+	const parquetWidthtrange=document.getElementById("parquetWidthtrange");
+	const parquetWidthnumber=document.getElementById("parquetWidthnumber");
+	parquetWidthtrange.addEventListener("input",(e)=>{parquetWidthnumber.value=parquetWidthtrange.value;reBuild();});
+	parquetWidthnumber.addEventListener("input",(e)=>{parquetWidthtrange.value=parquetWidthnumber.value; reBuild();});
+	//радиус элемента
+	const parquetRadiusrange=document.getElementById("parquetRadiusrange");
+	const parquetRadiusnumber=document.getElementById("parquetRadiusnumber");
+	parquetRadiusrange.addEventListener("input",(e)=>{parquetRadiusnumber.value=parquetRadiusrange.value;reBuild();});
+	parquetRadiusnumber.addEventListener("input",(e)=>{parquetRadiusrange.value=parquetRadiusnumber.value; reBuild();});
+	//столбцы
+	const parquetRowsrange=document.getElementById("parquetRowsrange");
+	const parquetRowsnumber=document.getElementById("parquetRowsnumber");
+	parquetRowsrange.addEventListener("input",(e)=>{parquetRowsnumber.value=parquetRowsrange.value;reBuild();});
+	parquetRowsnumber.addEventListener("input",(e)=>{parquetRowsrange.value=parquetRowsnumber.value; reBuild();});
+	
+	const parquetColumnsrange=document.getElementById("parquetColumnsrange");
+	const parquetColumnsnumber=document.getElementById("parquetColumnsnumber");
+	parquetColumnsrange.addEventListener("input",(e)=>{parquetColumnsnumber.value=parquetColumnsrange.value;reBuild();});
+	parquetColumnsnumber.addEventListener("input",(e)=>{parquetColumnsrange.value=parquetColumnsnumber.value; reBuild();});
+	
+	const polarToCartesian=(ox, oy, r, Phi)=>{
+		return String(ox + (r * Math.cos((Phi - 90) * Math.PI / 180.0)))+" "+String(oy + (r * Math.sin((Phi - 90) * Math.PI / 180.0)));
+	}
+	//возвращает path элемент правильного шестиугольника с центром в точке ox oy и радиусом описанной окружности r
+	const hexagonForming=(ox,oy,r)=>{
+	let angle=0;
+	//расстояние между параллельными ребрами
+	let width=Math.sqrt(3)/2*(2*r);
+	//высота r/2
+		let ans="M "+polarToCartesian(ox,oy,r,angle)+" L ";
+		for (let i=angle+60;i<=300+angle;i+=60){
+			ans+=polarToCartesian(ox,oy,r,i)+" "
+		}
+		ans+="z";
+		return ans;
+	}
+	//Возвращает SVG гексигональный паркет шириной n и высотой m шестиугольников радиуса r c расстоянием между ними l 
+	//размещенный в холсте шириной width и высотой height пикселей
+	const createParquet=(width,height,n,m,r,l)=>{
+		const hexagonWidth=Math.sqrt(3)/2*(2*r);
+		const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		const background=document.createElementNS("http://www.w3.org/2000/svg", "rect"); 
+		const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		const hexagon = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+		const animate=document.createElementNS("http://www.w3.org/2000/svg", "animate");
+		
+		animate.setAttribute("attributeName","fill");
+		animate.setAttribute("attributeType","XML");
+		animate.setAttribute("values","#9a5aa3;#0054a4;#c3996b;#d81a5b;#f69542;#9a5aa3;");
+		animate.setAttribute("dur","1s");
+		animate.setAttribute("repeatCount","indefinite");
+		
+		SVG.setAttribute("width", width);
+		SVG.setAttribute("height", height);
+		SVG.setAttribute("id", "parquet");
+		SVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+		SVG.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink"); 
+		SVG.appendChild(defs);
+		background.setAttribute("width","100%");
+		background.setAttribute("height","100%");
+		background.setAttribute("fill","blue");
+		background.appendChild(animate);
+		SVG.appendChild(background);
+		hexagon.setAttribute("id","hexagon");
+		hexagon.setAttribute("fill","white");
+		hexagon.setAttribute("stroke","none");
+		hexagon.setAttribute("d",hexagonForming(0,0,r));
+		defs.appendChild(hexagon);
+		SVG.appendChild(horizontal);
+		horizontal.setAttribute("id","horizontalGroup")
+		for(let i=0;i<n;i++){
+			let hexClone= document.createElementNS("http://www.w3.org/2000/svg", "use");
+			hexClone.setAttribute("x",hexagonWidth*i+l*i);
+			hexClone.setAttribute("y",0);
+			hexClone.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#hexagon');
+			hexClone.setAttribute("fill","black");
+			hexClone.setAttribute("stroke","none");
+			hexClone.setAttribute("d",hexagonForming(hexagonWidth*i+l*i,0,r));
+			horizontal.appendChild(hexClone);
+		}
+		SVG.appendChild(horizontal);
+		for (i=1;i<m;i++){
+			let horClone = document.createElementNS("http://www.w3.org/2000/svg", "use");
+			horClone.setAttribute("x",i%2?hexagonWidth/2+l/2:0);
+			horClone.setAttribute("y",i*1.5*r+l*i);
+			horClone.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#horizontalGroup');
+			SVG.appendChild(horClone);
+		}
+		
+		svgContainer.appendChild(SVG);
+	}
+	const reBuild=()=>{
+		svgContainer.innerHTML="";
+		createParquet(parquetHeightnumber.value,parquetWidthnumber.value,parquetRowsnumber.value,parquetColumnsnumber.value,parquetRadiusnumber.value,5);
+	}
+  </script>
+
+<script type="text/javascript">
+//let hex=document.getElementById("template");
+	//hex.setAttribute("d",hexagonForming(0,0,30));
+	createParquet(400,400,15,15,15,5);
+</script>
+</body>
+
+</html>
