@@ -52,7 +52,7 @@
 		<p><input type="range" min="1" max="100" step="1" value="15" id="parquetRowsrange" name="rows"><input min="1" value="15" class="number" id="parquetRowsnumber" type="number" name="rows"></p>
 		<p>Columns</p>
 		<p><input type="range" min="1" max="100" step="1" id="parquetColumnsrange" value="15"><input class="number" value="15" type="number" name="columns" id="parquetColumnsnumber"></p>
-		<p>Space <input class="number" min="0" value=1 type="number" name="space" ></p>
+		<p>Space <input class="number" min="0" value=1 type="number" name="space" id="parquetSpacenumber"></p>
 		
            
 	</div>
@@ -84,6 +84,9 @@
 	parquetColumnsrange.addEventListener("input",(e)=>{parquetColumnsnumber.value=parquetColumnsrange.value;reBuild();});
 	parquetColumnsnumber.addEventListener("input",(e)=>{parquetColumnsrange.value=parquetColumnsnumber.value; reBuild();});
 	
+	const parquetSpacenumber=document.getElementById("parquetSpacenumber");
+	parquetSpacenumber.addEventListener("input",(e)=>{reBuild();});
+	
 	const polarToCartesian=(ox, oy, r, Phi)=>{
 		return String(ox + (r * Math.cos((Phi - 90) * Math.PI / 180.0)))+" "+String(oy + (r * Math.sin((Phi - 90) * Math.PI / 180.0)));
 	}
@@ -109,9 +112,9 @@
 		const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		const hexagon = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-		/*const animate=document.createElementNS("http://www.w3.org/2000/svg", "animate");
+		const animate=document.createElementNS("http://www.w3.org/2000/svg", "animate");
 		
-		animate.setAttribute("attributeName","fill");
+		/*animate.setAttribute("attributeName","fill");
 		animate.setAttribute("attributeType","XML");
 		animate.setAttribute("values","#9a5aa3;#0054a4;#c3996b;#d81a5b;#f69542;#9a5aa3;");
 		animate.setAttribute("dur","1s");
@@ -158,12 +161,14 @@
 	}
 	const reBuild=()=>{
 		svgContainer.innerHTML="";
-		createParquet(parquetHeightnumber.value,parquetWidthnumber.value,parquetRowsnumber.value,parquetColumnsnumber.value,parquetRadiusnumber.value,5);
+		createParquet(parquetHeightnumber.value,parquetWidthnumber.value,parquetRowsnumber.value,parquetColumnsnumber.value,parquetRadiusnumber.value,parquetSpacenumber.value);
 	}
   </script>
 
 <script type="text/javascript">
-	createParquet(400,400,15,15,15,5);
+//let hex=document.getElementById("template");
+	//hex.setAttribute("d",hexagonForming(0,0,30));
+	createParquet(400,400,15,15,15,1);
 </script>
 </body>
 
