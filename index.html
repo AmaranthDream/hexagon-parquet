@@ -109,13 +109,13 @@
 		const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		const hexagon = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-		const animate=document.createElementNS("http://www.w3.org/2000/svg", "animate");
+		/*const animate=document.createElementNS("http://www.w3.org/2000/svg", "animate");
 		
 		animate.setAttribute("attributeName","fill");
 		animate.setAttribute("attributeType","XML");
 		animate.setAttribute("values","#9a5aa3;#0054a4;#c3996b;#d81a5b;#f69542;#9a5aa3;");
 		animate.setAttribute("dur","1s");
-		animate.setAttribute("repeatCount","indefinite");
+		animate.setAttribute("repeatCount","indefinite");*/
 		
 		SVG.setAttribute("width", width);
 		SVG.setAttribute("height", height);
@@ -126,7 +126,7 @@
 		background.setAttribute("width","100%");
 		background.setAttribute("height","100%");
 		background.setAttribute("fill","blue");
-		background.appendChild(animate);
+		/*background.appendChild(animate);*/
 		SVG.appendChild(background);
 		hexagon.setAttribute("id","hexagon");
 		hexagon.setAttribute("fill","white");
@@ -163,8 +163,6 @@
   </script>
 
 <script type="text/javascript">
-//let hex=document.getElementById("template");
-	//hex.setAttribute("d",hexagonForming(0,0,30));
 	createParquet(400,400,15,15,15,5);
 </script>
 </body>
