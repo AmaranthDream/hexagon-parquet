@@ -16,7 +16,7 @@
 	}
 	#controls{
 		width:250px;
-		height:950px;
+		height:1000px;
 		border : 1px solid black;
 		flex-shrink: 0;
 		flex-grow: 0;
@@ -53,6 +53,8 @@
 		<p><input id="parquetOffsetXrange" type="range" min="-1" max="1" step="0.01" value="0" name="height"><input class="number" id="parquetOffsetXnumber" min="-1" value="0" max="1" step="0.01" type="number" name="height"></p>
 		<p>Offset y</p>
 		<p><input id="parquetOffsetYrange" type="range" min="-1" max="1" step="0.01" value="0" name="height"><input class="number" id="parquetOffsetYnumber" min="-1" value="0" max="1" step="0.01" type="number" name="height"></p>
+		<p>Angle</p>
+		<p><input id="parquetAnglerange" type="range" min="-90" max="90" step="1" value="0" name="height"><input class="number" id="parquetAnglenumber" min="-90" value="0" max="90" step="0.01" type="number" name="height"></p>
 		ELEMENTS
 		<p>Borders<input type="checkbox" id="elementBordercheckbox"><input id="elementBordercolor" type="color" name="background" disabled><input id="elementBordernumber" class="number" type="number" name="border" min=0 step=1 value=1 disabled></p>
 		<p>Background <input type="checkbox" checked id="elementBackgroundcheckbox"><input type="color" id="elementBackgroundcolor" name="background" value="#FFFFFF"></p>
@@ -122,6 +124,12 @@
 	parquetOffsetYrange.addEventListener("input",(e)=>{parquetOffsetYnumber.value=parquetOffsetYrange.value;reBuild()});
 	parquetOffsetYnumber.addEventListener("input",(e)=>{parquetOffsetYrange.value=parquetOffsetYnumber.value;reBuild()});
 	
+	//Угол
+	const parquetAnglerange=document.getElementById("parquetAnglerange");
+	const parquetAnglenumber=document.getElementById("parquetAnglenumber");
+	parquetAnglerange.addEventListener("input",(e)=>{parquetAnglenumber.value=parquetAnglerange.value;reBuild()});
+	parquetAnglenumber.addEventListener("input",(e)=>{parquetAnglerange.value=parquetAnglenumber.value;reBuild()});
+	
 	//радиус элемента
 	const parquetRadiusrange=document.getElementById("parquetRadiusrange");
 	const parquetRadiusnumber=document.getElementById("parquetRadiusnumber");
@@ -169,7 +177,7 @@
 	}
 	//Возвращает SVG гексигональный паркет шириной n и высотой m шестиугольников радиуса r c расстоянием между ними l 
 	//размещенный в холсте шириной width и высотой height пикселей
-	const createParquet=(width,height,n,m,r,l,bgColor,elColor,border,borderWidth,offsetX,offsetY)=>{
+	const createParquet=(width,height,n,m,r,l,bgColor,elColor,border,borderWidth,offsetX,offsetY,angle)=>{
 		const hexagonWidth=Math.sqrt(3)/2*(2*r);
 		const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		const background=document.createElementNS("http://www.w3.org/2000/svg", "rect"); 
@@ -205,7 +213,7 @@
 		hexagon.setAttribute("d",hexagonForming(0,0,r));
 		defs.appendChild(hexagon);
 		SVG.appendChild(mainGroup);
-		mainGroup.setAttribute("transform","translate("+offsetX+","+offsetY+")");
+		mainGroup.setAttribute("transform","translate("+offsetX+","+offsetY+") rotate("+angle+")");
 		mainGroup.appendChild(horizontal);
 		horizontal.setAttribute("id","horizontalGroup")
 		for(let i=0;i<n;i++){
@@ -230,14 +238,14 @@
 	}
 	const reBuild=()=>{
 		svgContainer.innerHTML="";
-		createParquet(parquetWidthnumber.value,parquetHeightnumber.value,parquetColumnsnumber.value,parquetRowsnumber.value,parquetRadiusnumber.value,parquetSpacenumber.value,parquetBackgroundcolor.disabled?"none":parquetBackgroundcolor.value,elementBackgroundcolor.disabled?"none":elementBackgroundcolor.value,elementBordercolor.disabled?"none":elementBordercolor.value,elementBordernumber.value,parquetWidthnumber.value*parquetOffsetXnumber.value,parquetHeightnumber.value*parquetOffsetYnumber.value);
+		createParquet(parquetWidthnumber.value,parquetHeightnumber.value,parquetColumnsnumber.value,parquetRowsnumber.value,parquetRadiusnumber.value,parquetSpacenumber.value,parquetBackgroundcolor.disabled?"none":parquetBackgroundcolor.value,elementBackgroundcolor.disabled?"none":elementBackgroundcolor.value,elementBordercolor.disabled?"none":elementBordercolor.value,elementBordernumber.value,parquetWidthnumber.value*parquetOffsetXnumber.value,parquetHeightnumber.value*parquetOffsetYnumber.value,parquetAnglenumber.value);
 	}
   </script>
 
 <script type="text/javascript">
 //let hex=document.getElementById("template");
 	//hex.setAttribute("d",hexagonForming(0,0,30));
-	createParquet(400,400,18,18,15,1,"#0000FF","#FFFFFF","none",1,0,0);
+	createParquet(400,400,18,18,15,1,"#0000FF","#FFFFFF","none",1,0,0,0);
 </script>
 </body>
 
